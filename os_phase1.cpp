@@ -11,13 +11,17 @@ void startexecution();
 void executeuserprogram();
 void MOS(int );
 void calculate_address();
-char memory[100][4],ir[4];
+char memory[100][4],ir[4],c,R;
 string next_to_amj="cdss",data;
-int blocks=0,ic=0,c=0,m=0,R,data_counter,address,row_no,col_no;
+int blocks=0,ic=0,m=0,data_counter,address,row_no,col_no;
 ifstream infile("test.txt");
+ofstream outfile;
 int main()
 {
+	outfile.open("output.txt");
 	load();
+	infile.close();
+	outfile.close();
 }
 int find()
 {
@@ -27,14 +31,10 @@ int find()
 		if(*it == 'H')
 		{
 			cout<<"returning 0"<<endl;
+			memory[m][0]='H';
 			return 0;
 		}
 	return 1;	
-	//int found = s2.get('H');
-	
-	//cout <<s2<<" "<< "returning " <<(found)<<endl;
-	
-	//return 0;
 }
 
 void load()
@@ -51,7 +51,9 @@ void load()
     	temp = file_content.substr(0,4); //compare temp to check 
 										 // the actions to be perform    	
     	if(temp == "$END")	//break the while loop
-    		break;	
+		{
+			break;
+		}
     	else if(temp == "$AMJ") //for $AMJ go on accepting
     							//from file till you get H
     							//And store it in memory initial blocks
@@ -108,14 +110,28 @@ void executeuserprogram()
 		else if(instruction == "LR")
 		{
 			calculate_address();
-			R = (int)memory[row_no][col_no];
+			R = memory[row_no][col_no];
 			cout<<"value of r is "<<R<<endl;
 		}
 		else if(instruction == "SR")
 		{
 			calculate_address();			
-			memory[row_no][col_no] = (char)R;			
+			memory[row_no][col_no] = R;			
 			cout<<"value of mem is "<<memory[row_no][col_no]<<endl;
+		}
+		else if(instruction == "CR")
+		{
+			calculate_address();			
+			char cmp = memory[row_no][col_no];
+			if(cmp == R)
+				c = 'T';
+		}
+		else if(instruction == "BT")
+		{
+			cout<<"C is "<<c<<endl;
+			if(c == 'T')
+				ic = ((ir[2] - 48) * 10) + (ir[3] - 48);
+			cout<<"Instruction counter is now "<<ic<<endl;
 		}
 		 
 	}
@@ -126,20 +142,24 @@ void MOS(int si)
 	{
 		case 1:		//GD Operation will take place here 
 				{		//i.e reading a line after DTA pointed by data_counter
-					string temp;
+					string temp,data;
+					ir[3] = 0;					
 					calculate_address();			
 					getline(infile,data);
 					cout<<"Data is "<<data<<endl;
-					temp = data.substr(0,4);		
+					temp = data.substr(0,4);
+					cout<<"temppppp "<<temp<<endl;
 					if(temp == "$END" || temp == "")
 					{
 						cout<<"Insufficient Arguments Passed";
+						outfile.close();
 						exit(0);
 					}					
 					if(row_no > 100)
 					{
 						cout<<"Memory is exceeded"<<endl;
 						cout<<"row no "<<row_no<<endl;
+						outfile.close();
 						exit(0);
 					}
 					int counter = 0;
@@ -148,24 +168,38 @@ void MOS(int si)
 						{
 							memory[i][j] = data[counter];
 							counter += 1;
-							cout<<"i is\t"<<i<<"j is "<<j<<"\t"<<data.length()<<endl;
-							
+							cout<<"i is\t"<<i<<"j is "<<j<<"\t"<<data.length()<<endl;							
 						}
 					break;
 				}
 
-		case 2:
-				cout<<"Read Data Here";
+		case 2:			// In PD Data is written to output file
+						// from ex 30 to 39 mem location (10 words)
+				{
+					cout<<"In PD"<<endl;
+					ir[3] = 0;
+					calculate_address();
+					int count = 0;
+					char* buffer = new char[1];			
+					for(int row = row_no;count < 10;row++)
+					{
+						count++;
+						for(int col = 0;col < 4;col++)
+						{
+							outfile<<memory[row][col];
+						}
+					}
+				}
+				
 		case 3:
 				cout<<"Halt Here";
 					
 	}
-	infile.close();
+	//infile.close();
 }
 void calculate_address()
 {
-	address = (ir[2]-48) * 10 + (ir[3] - 48);
-	row_no = address / 4;
-	col_no = address % 4;	
+	row_no = (ir[2] - 48) * 10;
+	col_no = (ir[3] - 48);
 }
 
