@@ -11,7 +11,9 @@ void startexecution();
 void executeuserprogram();
 void MOS(int );
 void calculate_address();
-char memory[100][4]={0},ir[4],c,R;
+void go_to_end();
+void reset_memory();
+char memory[100][4],ir[4],c,R;
 string next_to_amj="cdss",data;
 int blocks=0,ic=0,m=0,data_counter,address,row_no,col_no;
 ifstream infile("test.txt");
@@ -36,11 +38,34 @@ int find(string trimmed_string)
 		}
 	return 1;	
 }
-
+void go_to_end()
+{
+	string temp,file_content;
+	while(1)
+	{
+		if (!getline( infile, file_content)) break; //Accept a string 
+    												//from file
+    	temp = file_content.substr(0,4); //compare temp to check 
+										 // the actions to be perform    	
+    	if(temp == "$END")	//break the while loop
+		{ 
+			cout<<"end found line is "<<file_content<<endl;
+			return;
+		}
+	}
+}
+void reset_memory()
+{
+	for(int i=0;i<100;i++)
+		for(int j=0;j<4;j++)
+			memory[i][j] = ' ';
+			
+}	
+	
 void load()
 {
 	int flag=0;
-
+	reset_memory();
 	
 	while (infile)
   	{
@@ -53,8 +78,7 @@ void load()
     	if(temp == "$END")	//break the while loop
 		{
 			//Reset all values here
-			memory[100][4]={0};
-			ir[4]={0};
+			reset_memory();
 			ic=m=data_counter=address=0;
 			outfile<<"\n\n";
 			continue;
@@ -142,7 +166,8 @@ void executeuserprogram()
 		{
 			cout<<"C is "<<c<<endl;
 			if(c == 'T')
-				ic = ((ir[2] - 48) * 10) + (ir[3] - 48);
+				ic = ((ir[2] - 48) * 10) + (ir[3] - 48)-1;
+			c = 'F';
 			cout<<"Instruction counter is now "<<ic<<endl;
 		}
 		 
@@ -164,19 +189,22 @@ void MOS(int si)
 					if(temp == "$END" || temp == "")
 					{
 						cout<<"Insufficient Arguments Passed";
-						outfile.close();
-						exit(0);
+						reset_memory();
+						ic=m=data_counter=address=0;
+						outfile<<"\n\n";
 					}					
 					if(row_no > 100)
 					{
 						cout<<"Memory is exceeded"<<endl;
 						cout<<"row no "<<row_no<<endl;
-						outfile.close();
-						exit(0);
+						reset_memory();
+						ic=m=data_counter=address=0;
+						outfile<<"\n\n";
+						go_to_end();
 					}
 					int counter = 0;
-					for(int i = row_no;counter<(data.length()-1);i++)
-						for(int j = 0;j<4 && counter<(data.length()-1);j++)
+					for(int i = row_no;counter<(data.length());i++)
+						for(int j = 0;j<4 && counter<(data.length());j++)
 						{
 							memory[i][j] = data[counter];
 							counter += 1;
@@ -199,12 +227,13 @@ void MOS(int si)
 						count++;
 						for(int col = 0;col < 4;col++)
 						{
+							/*
 							if(memory[row][col] == ' ')
 							{
 								//cout<<"\t";
 								outfile<<"\t";
 							}
-							else
+							else*/
 							{
 								cout<<"Writting "<<memory[row][col]<<endl;
 								outfile<<memory[row][col];
