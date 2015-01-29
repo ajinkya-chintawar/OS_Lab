@@ -28,11 +28,10 @@ int main()
 int find(string trimmed_string)
 {
 	string :: iterator it;
-	cout<<"String is " <<trimmed_string<<endl;
+	//cout<<"String is " <<trimmed_string<<endl;
 	for (it= trimmed_string.begin(); it != trimmed_string.end(); it++)
 		if(*it == 'H')
 		{
-			cout<<"returning 0"<<endl;
 			memory[m][0]='H';
 			return 0;
 		}
@@ -48,10 +47,7 @@ void go_to_end()
     	temp = file_content.substr(0,4); //compare temp to check 
 										 // the actions to be perform    	
     	if(temp == "$END")	//break the while loop
-		{ 
-			cout<<"end found line is "<<file_content<<endl;
 			return;
-		}
 	}
 }
 void reset_memory()
@@ -110,10 +106,17 @@ void load()
 	    		if(flag == 1)	//We got h as substring in inner loop so break
 					break; 		
     		}
-    	
+    		cout<<"code in memory \n";
+			for(int i=0;i<=m;i++)
+			{
+				for(int j=0;j<4;j++)
+					cout<<memory[i][j];
+				cout<<"\n";
+			}
     	}		
-    	else		// Start executing control cards    	
+    	else if(temp == "$DTA")		// Start executing control cards    	
     		startexecution();
+		
     }
     
     
@@ -125,8 +128,9 @@ void startexecution()
 }
 void executeuserprogram()
 {
-	for(int ic = 0;ic < m; ic++)
+	for(int ic = 0;ic <= m; ic++)
 	{
+		
 		string temp,temp1,instruction;
 		for(int j=0;j<4;j++)
 			ir[j] = memory[ic][j];			
@@ -152,7 +156,6 @@ void executeuserprogram()
 		{
 			calculate_address();			
 			memory[row_no][col_no] = R;
-			cout<<"In sr row nd cols are "<<row_no<<"\t"<<col_no<<endl;
 			cout<<"value of mem is "<<memory[row_no][col_no]<<endl;
 		}
 		else if(instruction == "CR")
@@ -188,17 +191,19 @@ void MOS(int si)
 					temp = data.substr(0,4);
 					if(temp == "$END" || temp == "")
 					{
-						cout<<"Insufficient Arguments Passed";
+						cout<<"Insufficient Arguments Passed \n";
 						reset_memory();
 						ic=m=data_counter=address=0;
+						outfile<<"Insufficient Arguments Passed \n";
 						outfile<<"\n\n";
 					}					
 					if(row_no > 100)
 					{
-						cout<<"Memory is exceeded"<<endl;
+						cout<<"Memory is exceeded \n"<<endl;
 						cout<<"row no "<<row_no<<endl;
 						reset_memory();
 						ic=m=data_counter=address=0;
+						outfile<<"Memory is exceeded \n";
 						outfile<<"\n\n";
 						go_to_end();
 					}
@@ -207,8 +212,7 @@ void MOS(int si)
 						for(int j = 0;j<4 && counter<(data.length());j++)
 						{
 							memory[i][j] = data[counter];
-							counter += 1;
-							cout<<"i is\t"<<i<<"j is "<<j<<"\t"<<data.length()<<endl;							
+							counter += 1;							
 						}
 					break;
 				}
@@ -227,17 +231,7 @@ void MOS(int si)
 						count++;
 						for(int col = 0;col < 4;col++)
 						{
-							/*
-							if(memory[row][col] == ' ')
-							{
-								//cout<<"\t";
-								outfile<<"\t";
-							}
-							else*/
-							{
-								cout<<"Writting "<<memory[row][col]<<endl;
-								outfile<<memory[row][col];
-							}	
+								outfile<<memory[row][col];	
 						}
 					}
 					outfile<<"\n";
@@ -248,11 +242,9 @@ void MOS(int si)
 				cout<<"Halt Here";
 					
 	}
-	//infile.close();
 }
 void calculate_address()
 {
 	row_no = (ir[2] - 48) * 10;
 	col_no = (ir[3] - 48);
 }
-
