@@ -1,0 +1,5 @@
+Issuse after checking all cases...
+
+1. Multiple cases are not handled.
+
+2. The correct solution is obtained in cases	#4	#7	#8 ONLY [input provided one case at a time only]
