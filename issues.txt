@@ -1,0 +1,9 @@
+Issuse after checking all cases...
+
+1.	Multiple cases are not handled.
+
+2.	The correct solution is obtained in most of the cases [input provided one case at a time only]
+	#2: Print No Error Message
+	#5: Showing operation code error instead of Operand Error
+	#8: Showing operation code error only. No TLE
+	#9: Showing TLE only while it has both TLE and Operand Error
